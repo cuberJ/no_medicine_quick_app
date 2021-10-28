@@ -1,0 +1,59 @@
+{
+  "package": "com.application.demo",
+  "name": "安咳消",
+  "versionName": "1.0.0",
+  "versionCode": 1,
+  "minPlatformVersion": 1070,
+  "icon": "./assets/images/药丸.png",
+  "deviceTypeList": [
+    "phone"
+  ],
+  "features": [
+    {
+      "name": "system.prompt"
+    },
+    {
+      "name": "system.router"
+    },
+    {
+      "name": "system.shortcut"
+    },
+    {
+      "name": "service.asr"
+    },
+    {
+      "name": "system.vibrator"
+    },
+    {
+      "name": "system.storage"
+    },
+    {
+      "name":"system.notification"
+    },
+    { "name": "system.alarm" }
+  ],
+  "permissions": [
+    {
+      "origin": "*"
+    }
+  ],
+  "config": {
+    "logLevel": "debug"
+  },
+  "router": {
+    "entry": "MainPage",
+    "pages": {
+      "MainPage": {
+        "component": "index"
+      },
+      "Input": {
+        "component": "index"
+      }
+    }
+  },
+  "display": {
+    "titleBarBackgroundColor": "#ffffff",
+    "titleBarTextColor": "#414141",
+    "menu": true
+  }
+}
