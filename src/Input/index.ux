@@ -44,19 +44,19 @@
         
         <div class='med-type'>
                 <div class="med-type-freq">
-                  <input type="radio" name='freq' value="一日一次" class="type">
+                  <input type="radio" name='freq' value="一日一次" class="type" checked="true" onclick="display_1">
                   <text class="name" >每日1次</text>
                 </div>
                 <div class="med-type-freq">
-                  <input type="radio" value='一日两次' class="type" name="freq">
+                  <input type="radio" value='一日两次' class="type" name="freq" onchange="display_2">
                   <text class="name">每日2次</text>
                 </div>
                 <div class="med-type-freq">
-                  <input type="radio" value='一日三次' class="type" name="freq">
+                  <input type="radio" value='一日三次' class="type" name="freq" onclick="display_3">
                   <text class="name">每日3次</text>
                 </div>
                 <div class="med-type-freq">
-                  <input type="radio" class="type" name="freq">
+                  <input type="radio" class="type" name="freq" onclick="display_4">
                   <text class="name">每日4次</text>
                 </div>
           </div>
@@ -74,12 +74,21 @@
       </div>
 
       <!-- 输入药物的服用时间 -->
+      <!-- 依据每日服用次数修改eat-time-input 的display属性 -->
       <div class='ddl-area'>
-        <text class="normal-text">服用时间</text>
+        <div class="serve-title">
+          <text class="normal-text">服用时间</text>
+          <div class="alarm">
+            <input type="radio" class="type" name="alarm" onclick="alarm_func_able" checked="true">
+            <text class="name">打开闹钟</text>
+            <input type="radio" class="type" name="alarm" onclick="alarm_func_disable">
+            <text class="name">关闭闹钟</text>
+          </div>
+        </div>
         <div class='time-area'>
-          <div class="eat-time-input">
+          <div class="{{eat_enable_1 ? 'eat-time-input' : 'eat-time-input-disable'}}" id='eat_input_1'>
             <div class='time-input'>
-              <picker class='time-picker' id='picker_1' type="time" value="{{end_time_1}}" onchange="getEndTime"></picker>
+              <picker class='time-picker' id='picker_1' type="time" value="{{end_time_1}}" onchange="getEndTime_1"></picker>
               <div class='time-image'></div>
             </div>
             <div class="med-type-freq">
@@ -91,9 +100,9 @@
                   <text class="name">饭后</text>
             </div>
           </div>
-          <div class="eat-time-input">
+          <div class="{{eat_enable_2 ? 'eat-time-input' : 'eat-time-input-disable'}}" id='eat_input_2'>
             <div class='time-input'>
-              <picker class='time-picker' id='picker_2' type="time" value="{{end_time_1}}" onchange="getEndTime"></picker>
+              <picker class='time-picker' id='picker_2' type="time" value="{{end_time_2}}" onchange="getEndTime_2"></picker>
               <div class='time-image'></div>
             </div>
             <div class="med-type-freq">
@@ -105,23 +114,23 @@
                   <text class="name">饭后</text>
             </div>
           </div>
-          <div class="eat-time-input">
+          <div class="{{eat_enable_3 ? 'eat-time-input' : 'eat-time-input-disable'}}" id='eat_input_3'>
             <div class='time-input'>
-              <picker class='time-picker' id='picker_3' type="time" value="{{end_time_1}}" onchange="getEndTime"></picker>
+              <picker class='time-picker' id='picker_3' type="time" value="{{end_time_3}}" onchange="getEndTime_3"></picker>
               <div class='time-image'></div>
             </div>
             <div class="med-type-freq">
                   <input type="radio" class="type" name="dinner_3" checked="true">
                   <text class="name">饭前</text>
             </div>
-            <div class="med-type-freq">
+            <div class="med-type-freq" >
                   <input type="radio" class="type" name="dinner_3">
                   <text class="name">饭后</text>
             </div>
           </div>
-          <div class="eat-time-input">
+          <div class="{{eat_enable_4 ? 'eat-time-input' : 'eat-time-input-disable'}}" id='eat_input_4'>
             <div class='time-input'>
-              <picker class='time-picker' id='picker_4' type="time" value="{{end_time_1}}" onchange="getEndTime"></picker>
+              <picker class='time-picker' id='picker_4' type="time" value="{{end_time_4}}" onchange="getEndTime_4"></picker>
               <div class='time-image'></div>
             </div>
             <div class="med-type-freq">
@@ -164,9 +173,15 @@ export default {
     end_time_2: '14:00',
     end_time_3: '20:00',
     end_time_4: '18:00',
+    time_choice : 1,
+    alarm_enable : true,
 
     checked: false,
     enabled: false,
+    eat_enable_1: true,
+    eat_enable_2: false,
+    eat_enable_3: false,
+    eat_enable_4: false,
     scale: ''
   },
   //修改任务时使用，新建时不使用
@@ -324,8 +339,17 @@ export default {
   getEndDate(e) {
     this.end_date = e.year + '-' + (e.month + 1) + '-' + e.day
   },
-  getEndTime(e) {
+  getEndTime_1(e) {
     this.end_time_1 = e.hour + ':' + e.minute
+  },
+  getEndTime_2(e) {
+    this.end_time_2 = e.hour + ':' + e.minute
+  },
+  getEndTime_3(e) {
+    this.end_time_3 = e.hour + ':' + e.minute
+  },
+  getEndTime_4(e) {
+    this.end_time_4 = e.hour + ':' + e.minute
   },
   
   //切换是否no ddl
@@ -342,6 +366,81 @@ export default {
         hour: hour,
         minute: minute
       })
+  },
+
+  // 依据服用次数修改服用时间
+  display_1(){
+    console.log('tests')
+    console.log(this.alarm_enable === true)
+    if(this.alarm_enable === true)
+    {
+      this.eat_enable_1 = true;
+      this.eat_enable_2 = false;
+      this.eat_enable_3 = false;
+      this.eat_enable_4 = false;
+      this.time_choice = 1;
+    }
+  },
+  display_2(){
+    if(this.alarm_enable === true)
+    {
+      this.eat_enable_1 = true;
+      this.eat_enable_2 = true;
+      this.eat_enable_3 = false;
+      this.eat_enable_4 = false;
+      this.end_time_2 = '14:00';
+      this.time_choice = 2;
+    }
+  },
+  display_3(){
+    if(this.alarm_enable === true)
+    {
+      this.eat_enable_1 = true;
+      this.eat_enable_2 = true;
+      this.eat_enable_3 = true;
+      this.eat_enable_4 = false;
+      this.end_time_2 = '14:00';
+      this.end_time_3 = '20:00';
+      this.time_choice = 3;
+    }
+  },
+  display_4(){
+    if(this.alarm_enable === true)
+    {
+      this.eat_enable_1 = true;
+      this.eat_enable_2 = true;
+      this.eat_enable_3 = true;
+      this.eat_enable_4 = true;
+      this.end_time_1 = '8:00';
+      this.end_time_2 = '13:00';
+      this.end_time_3 = '18:00';
+      this.end_time_4 = '23:00';
+      this.time_choice = 4;
+    }
+  },
+
+  // 启用闹钟功能
+  alarm_func_able(){
+    this.alarm_enable = true;
+    if(this.time_choice === 1) 
+      this.display_1();
+    else if(this.time_choice === 2)
+      this.display_2();
+    else if(this.time_choice === 3)
+      this.display_3();
+    else
+      this.display_4();
+    console.log("test2")
+  },
+
+  alarm_func_disable(){
+    this.alarm_enable = false;
+    
+    this.eat_enable_1 = false;
+    this.eat_enable_2 = false;
+    this.eat_enable_3 = false;
+    this.eat_enable_4 = false;
+    
   }
 }
 </script>
@@ -388,6 +487,19 @@ export default {
   }
     .ddl-area {
       flex-direction: column;
+      margin: 15px;
+      .serve-title{
+        flex-direction: row;
+        .alarm{
+          weight:200px;
+          .name{
+            font-weight: bold;
+            color: rgb(227, 129, 129);
+            font-size: 25px;
+            font-family: myfont, serif;
+          }
+        }
+      }
       .ddl {
         font-size: 25px;
         color: #000000;
@@ -417,6 +529,7 @@ export default {
         }
         .med-type-freq{
           padding-bottom: 10px;
+          min-width: 100px;
         }
        }
       }
@@ -434,10 +547,16 @@ export default {
     }
     .time-area {
       flex-direction: column;
+      .eat-time-input{
+          display: inline;
+      }
+      .eat-time-input-disable{
+        display: none;
+      }
       .time-input {
         flex-direction: row;
         height: 100px;
-        width: 400px;
+        width: 350px;
         border-radius: 20px;
         margin-bottom: 10px;
         background-color: #ffffff;
@@ -447,13 +566,15 @@ export default {
           margin-left: 50px;
           flex: 0;
           font-family: myfont, serif;
+          
         }
         .time-picker {
           width: 100px;
-          margin-left: 10px;
+          margin-left: 120px;
           flex: 1;
           font-weight: bolder;
           font-family: myfont, serif;
+          
         }
         .date-image {
           width: 40px;
@@ -486,7 +607,7 @@ export default {
 .normal-text {
   padding-top: 30px;
   padding-bottom: 30px;
-  width: 600px;
+  width: 300px;
   flex-wrap: nowrap;
   font-size: 35px;
   font-weight: bold;
