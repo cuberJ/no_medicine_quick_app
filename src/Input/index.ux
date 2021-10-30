@@ -1,15 +1,33 @@
 <!-- 本页面是新增药物的输入页面 -->
 <template>
   <div class="input-page">
-    <text>新药物录入</text>
     <div class='input-area'>
-      <div class='task-area'>
+      <div class='ddl-area'>
+        <div class="asr-input-area">
+          <textarea style='padding-top:10px; padding-left: 20px;' placeholder='示例：倍他乐克一天三次，每次一片'  value="{{eventName}}" onchange="updateValue"></textarea>
+          <div class="asr-btn-area">
+            <div class='asr-clear-btn' onclick='clearEventName'>
+              <text style="font-weight:bolder; font-size: 35px; color:white">清空</text>
+            </div>
+            <div class='asr-image1-area' ontouchstart="startAsr" ontouchend="endAsr">
+              <div class='asr-image1-1'></div>
+            </div>
+            <!-- <div class='asr-submit-btn' onclick='addEvent'> -->
+            <div class='asr-submit-btn' onclick='submitText'>
+              <text style="font-weight:bolder; font-size: 35px; color:white">转换</text>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex-direction:row; left:15px;">
         <text class='normal-text'>药物名称</text>
-        <input class="add-btn" type="button" value="完成" onclick="addEvent" />
+        <!-- <input class="add-btn" type="button" value="完成" onclick="addEvent" /> -->
       </div>
       <!-- 药物名称、语音输入 -->
       <div class='event-input'>
-        <input type="text" placeholder='示例：倍他乐克' value="{{eventName}}" onchange="updateValue"></input>
+        <input type="text" placeholder='示例：倍他乐克' value="{{med_name}}"  onchange="updateValue"></input>
+        
         <div class='clear-btn' onclick='clearEventName'></div>
         <div class='asr-image1' onclick='enableAsrBtn'></div>
       </div>
@@ -44,19 +62,19 @@
         
         <div class='med-type'>
                 <div class="med-type-freq">
-                  <input type="radio" name='freq' value="一日一次" class="type" checked="true" onclick="display_1">
+                  <input type="radio" name='freq' id="freq_choice_1" value="一日一次" class="type" checked="true" onclick="display_1">
                   <text class="name" >每日1次</text>
                 </div>
                 <div class="med-type-freq">
-                  <input type="radio" value='一日两次' class="type" name="freq" onchange="display_2">
+                  <input type="radio" value='一日两次' class="type" id="freq_choice_2" name="freq" onchange="display_2">
                   <text class="name">每日2次</text>
                 </div>
                 <div class="med-type-freq">
-                  <input type="radio" value='一日三次' class="type" name="freq" onclick="display_3">
+                  <input type="radio" value='一日三次' class="type" id="freq_choice_3" name="freq" onclick="display_3">
                   <text class="name">每日3次</text>
                 </div>
                 <div class="med-type-freq">
-                  <input type="radio" class="type" name="freq" onclick="display_4">
+                  <input type="radio" class="type" name="freq" id="freq_choice_4" onclick="display_4">
                   <text class="name">每日4次</text>
                 </div>
           </div>
@@ -68,7 +86,7 @@
       <div class='ddl-area'>
         <text class="normal-text">单次剂量</text>
         <div class='event-input'>
-          <input type="text" placeholder='示例：1片/100mg/10mL' value="{{eventName}}"></input>
+          <input type="text" placeholder='示例：1片/100mg/10mL' value="{{dose}}" ></input>
         <div class='clear-btn' onclick='clearEventName'></div>
         </div>
       </div>
@@ -145,7 +163,22 @@
         </div>
       </div>
 
-      
+      <!-- 拍照存储 -->
+      <div class='ddl-area'>
+        <div>
+          <text class="normal-text">图鉴封面</text>
+        </div>
+        <div class='event-input' style="height: 300px;">
+        <image class="image" style="resize-mode:fill" src="{{takePhotoUri}}"
+               show="{{takePhotoUri != ''}}"></image>
+        </div>
+
+        <div class="photo-area">
+          <input class="add-btn" type="button" value="拍照" onclick="takephoto" />
+          <input class="add-btn" type="button" value="选取" onclick="pickImage" />
+        </div>
+      </div>
+
       <!-- 语音输入按钮 -->
       <div class="asr-btn {{scale}} {{enabled ? 'asr-btn-enabled' : 'asr-btn-disabled'}}" ontouchstart="startAsr" ontouchend="endAsr">
           <div class='asr-image2'></div>
@@ -161,10 +194,13 @@ import vibrator from '@system.vibrator'
 import router from '@system.router'
 import notification from '@system.notification'
 import alarm from '@system.alarm' 
+import media from '@system.media'
+import prompt from '@system.prompt';
+
 var count = 0;
 export default {
   private: {
-    eventName: '',
+    eventName: '倍他乐克一天三次，每次一片',
     nameBackUp: '',
     start_date: '',
     start_time: '',
@@ -175,6 +211,8 @@ export default {
     end_time_4: '18:00',
     time_choice : 1,
     alarm_enable : true,
+    med_name: '',
+    dose: '', //单次服用剂量 
 
     checked: false,
     enabled: false,
@@ -182,7 +220,9 @@ export default {
     eat_enable_2: false,
     eat_enable_3: false,
     eat_enable_4: false,
-    scale: ''
+    scale: '',
+    pickImageUri: '',
+    takePhotoUri: '',
   },
   //修改任务时使用，新建时不使用
   protected: {
@@ -198,6 +238,7 @@ export default {
     this.initAsr()
     this.initTime()
     this.eventName = this.pushName
+    this.eventName = '倍他乐克一天三次，每次一片'
     if (this.pushStart != 'ok') {
       let list2 = this.pushStart.split('&')
       this.start_date = list2[0]
@@ -241,10 +282,10 @@ export default {
       }
     })
     asr.onpartialresult = ({ result }) => {
-      this.eventName = this.nameBackUp + `${result}`
+      this.eventName = this.nameBackUp + `${result}`;
     }
     asr.oncompleteresult = ({ result }) => {
-      this.eventName = this.nameBackUp + `${result.match(/\[(.*)\]/)[1]}`
+      this.eventName = this.nameBackUp + `${result.match(/\[(.*)\]/)[1]}`;
     }
     asr.onerror = (error) => {
       this.text = `onerror: ${error}`
@@ -257,6 +298,7 @@ export default {
     asr.start({
       success: function () {
         //多调用几遍使震动明显一些
+        that.eventName = '';
         vibrator.vibrate({ mode: 'short' })
         vibrator.vibrate({ mode: 'short' })
         vibrator.vibrate({ mode: 'short' })
@@ -441,6 +483,97 @@ export default {
     this.eat_enable_3 = false;
     this.eat_enable_4 = false;
     
+  },
+
+  // 拍照功能
+  takephoto(){
+    media.takePhoto({
+        success: (data) => {
+            console.log("handling success: " + data.uri);
+            this.takePhotoUri = data.uri;
+        },
+        cancel: () => {
+            prompt.showToast({
+                message: '拍照已取消',
+                duration: 0
+            });
+        },
+        fail: (data, code) => {
+            prompt.showToast({
+                message: 'fail msg:' + data + " code:" + code,
+                duration: 0
+            });
+        },
+        complete: () => {
+
+        }
+    })
+  },
+
+  // 选择照片
+  pickImage() {
+      media.pickImage({
+          success: (data) => {
+              console.log("handling success: " + data.uri);
+              // this.pickImageUri = data.uri;
+              this.takePhotoUri = data.uri;
+              console.log("handling success: " + this.takePhotoUri);
+              prompt.showToast({
+                  message: 'uri:' + this.takePhotoUri,
+                  duration: 0
+              });
+          }
+      })
+  },
+
+  //正则处理语音输入的文本
+  submitText(){
+    var basic = new RegExp(".+[一每1]+天.*[\d一二三四五六七八九十零两]+[次回].*[(每次)(每回)(每下)(一次)(1次)][\d一二三四五六七八九十百千零两]+.*");
+    var all_words = this.eventName.match(basic);
+    console.log('提取的句子内容为：' + all_words[0]);
+    console.log(this.eventName);
+
+    var basic_info_reg = new RegExp(".+[一每1]+天.*[\d一二三四五六七八九十两]+[次回]");
+    var basic_info = all_words[0].match(basic_info_reg);
+    console.log("basic_info[0]的内容Wie:" + basic_info[0]);
+    var freq_reg = new RegExp("[\d一二三四五六七八九十两]+[次回]");
+    var freq = String(basic_info[0]).match(freq_reg)
+    console.log("频率为:" + freq[0])
+    var med_name = basic_info[0].split(/[一每1]+天/);
+    med_name = med_name[0];
+    console.log("药物名为：" + med_name);
+
+    var number = all_words[0].replace(basic_info[0], '')
+    console.log("服用数量信息为：" + number);
+    number = number.match(/[\d一二三四五六七八九十百千两]+.*/);
+    console.log(number[0]);
+    var dict = {'一':1, '二':2, '三':3, '四':4, '五':5, '六':6, '七':7, '八':8, '九':9, '零':0, '十':10, '两':2};
+    
+    if(String(freq[0]).search(/\d/) === -1)
+    {
+      freq = dict[freq[0][0]];
+      console.log('修正后的freq:' + freq);
+    }
+    else
+    {
+      freq = freq[0].match(/\d/)[0];
+      console.log('提取的已有数字形式的freq：' + freq);
+      freq = Number(freq);
+    }
+    switch(freq)
+      {
+        case 1: this.display_1();break;
+        case 2: this.display_2(); break;
+        case 3: this.display_3(); break;
+        case 4: this.display_4(); break;
+        default: this.display_4();
+      }
+    this.med_name = med_name;
+    this.dose = number[0];
+    
+    
+    var dom = document.getElementById('freq_choice_4');
+    console.log(dom);
   }
 }
 </script>
@@ -452,7 +585,7 @@ export default {
 .input-page {
   flex-direction: column;
   > text {
-    height: 100px;
+    height: 300px;
     font-size: 40px;
     color: #000000;
     background-color: #ffffff;
@@ -476,12 +609,29 @@ export default {
         color: #ffffff;
         background-color: #473cb1;
         align-self: flex-end;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
         margin-left: 100px;
       }
     }
   }
 
+  .photo-area{
+    flex: 1;
+    flex-direction: row;
+    margin: 20px;
+  }
+
+  .add-btn{
+    width: 150px;
+    height: 80px;
+    font-size: 35px;
+    border-radius: 25px;
+    color: #ffffff;
+    background-color: #473cb1;
+    align-self: flex-end;
+    margin-bottom: 10px;
+    margin-left: 100px;
+  }
   .med-eat-method{
     flex-direction: row;
   }
@@ -545,6 +695,71 @@ export default {
         padding: 10px 30px;
       }
     }
+
+    .asr-input-area{
+      height: 300px;
+      border-radius: 20px;
+      background-color: #ffffff;
+      border: 5px solid rgb(238, 240, 245);
+      flex-direction: column;
+      
+      > textarea {
+        font-size: 30px;
+        height: 200px;
+      }
+      .asr-btn-area{
+        flex-direction: row;
+        
+        justify-content: space-between;
+        .asr-clear-btn{
+          height: 100px;
+          background-color: #FF6666;
+          border-radius: 20px;
+          width: 20%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: 10px;
+          .clear-btn-1{
+            width: 40px;
+            height: 40px;
+            border-width: 0px;
+            flex-shrink: 0;
+            background-image: url("/Common/cancle.png");
+          }
+        }
+
+        .asr-submit-btn{
+          height: 100px;
+          background-color: #66CC66;
+          border-radius: 20px;
+          width: 20%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: 10px;
+        }
+      }
+      .asr-image1-area{
+          background-color: #6699CC;
+          
+          border-radius: 20px;
+          width: 70%;
+          height: 100px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding-bottom: 10px;
+          .asr-image1-1{
+            width: 40px;
+            height: 40px;
+            border-width: 0px;
+            flex-shrink: 0;
+            background-image: url("/Common/asr.png");
+          }
+        }
+    }
+
     .time-area {
       flex-direction: column;
       .eat-time-input{

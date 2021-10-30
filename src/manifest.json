@@ -30,7 +30,9 @@
     {
       "name":"system.notification"
     },
-    { "name": "system.alarm" }
+    { "name": "system.alarm" },
+    { "name": "system.media" },
+    { "name": "system.prompt" }
   ],
   "permissions": [
     {
