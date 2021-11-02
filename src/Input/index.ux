@@ -62,19 +62,19 @@
         
         <div class='med-type'>
                 <div class="med-type-freq">
-                  <input type="radio" name='freq' id="freq_choice_1" value="一日一次" class="type" checked="true" onclick="display_1">
+                  <input type="radio" name='freq' id="freq_choice_1" value="一日一次" class="type" checked="{{freq_choice[0]}}" onclick="display_1">
                   <text class="name" >每日1次</text>
                 </div>
                 <div class="med-type-freq">
-                  <input type="radio" value='一日两次' class="type" id="freq_choice_2" name="freq" onchange="display_2">
+                  <input type="radio" value='一日两次' class="type" id="freq_choice_2" name="freq" onchange="display_2" checked="{{freq_choice[1]}}">
                   <text class="name">每日2次</text>
                 </div>
                 <div class="med-type-freq">
-                  <input type="radio" value='一日三次' class="type" id="freq_choice_3" name="freq" onclick="display_3">
+                  <input type="radio" value='一日三次' class="type" id="freq_choice_3" name="freq" onclick="display_3" checked="{{freq_choice[2]}}">
                   <text class="name">每日3次</text>
                 </div>
                 <div class="med-type-freq">
-                  <input type="radio" class="type" name="freq" id="freq_choice_4" onclick="display_4">
+                  <input type="radio" class="type" name="freq" id="freq_choice_4" onclick="display_4" checked="{{freq_choice[3]}}">
                   <text class="name">每日4次</text>
                 </div>
           </div>
@@ -213,6 +213,7 @@ export default {
     alarm_enable : true,
     med_name: '',
     dose: '', //单次服用剂量 
+    freq_choice:[true, false, false, false],
 
     checked: false,
     enabled: false,
@@ -328,7 +329,7 @@ export default {
 
   addEvent() {
     if (this.eventName === '') {
-      this.$app.$def.makeToast('error: task name must not be null')
+      this.$app.$def.makeToast('error: medicine name must not be null')
     }
     else {
       let start = this.start_date + '&' + this.start_time
@@ -560,20 +561,38 @@ export default {
       console.log('提取的已有数字形式的freq：' + freq);
       freq = Number(freq);
     }
+    this.freq_choice = [false, false, false, false];
     switch(freq)
       {
-        case 1: this.display_1();break;
-        case 2: this.display_2(); break;
-        case 3: this.display_3(); break;
-        case 4: this.display_4(); break;
-        default: this.display_4();
+        case 1: {
+          this.display_1();
+          this.freq_choice[0] = true;
+          break;
+          }
+        case 2: {
+          this.display_2();
+          this.freq_choice[1] = true;
+          break;
+          }
+        case 3: {
+          this.display_3();
+          this.freq_choice[2] = true;
+          console.log('成功转换')
+          break;
+          }
+        case 4: {
+          this.display_4();
+          this.freq_choice[3] = true;
+          break;
+          }
+        default:{
+          this.display_4();
+          this.freq_choice[3] = true;
+        }
       }
     this.med_name = med_name;
     this.dose = number[0];
     
-    
-    var dom = document.getElementById('freq_choice_4');
-    console.log(dom);
   }
 }
 </script>
