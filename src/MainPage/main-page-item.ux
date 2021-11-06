@@ -2,16 +2,17 @@
 <template>
   <div class="item">
     <list class='micro-list'>
-      <list-item class="micro-text" type="item" onclick='openInput(item.name,item.start,item.end,type,idx)'>
-        <text class='text1'>{{item.name}}</text>
+      <list-item class="micro-text" type="item" onclick='openInput(item.med_name,item.dose,item.freq_choice,type,item, idx)'>
+        <text class='text1'>{{item.med_name}}</text>
         <div class='time'>
-          <text class='text2'>剂量: {{item.start}}片</text>
-          <text class='text2'>下次用药时间: {{item.end}}</text>
+          <text class='text2'>单次剂量:\n{{item.dose}}</text>
+          <text class='text2'>下次用药时间:\n{{item.freq_choice}}\n</text>
+          
         </div>
       </list-item>
       <list-item class="micro-btn" type="item">
-        <div if='{{type != 2}}' class='check-btn' onclick="markDone(idx)"></div>
-        <div if="{{type == 2}}" class='cancle-btn' onclick="delItem(idx)"></div>
+        <!-- <div if='{{type != 2}}' class='check-btn' onclick="markDone(idx)"></div> -->
+        <div class='cancle-btn' onclick="delItem(idx, type)"></div>
       </list-item>
     </list>
   </div>
@@ -22,16 +23,16 @@
 
 .item {
   flex: 1;
-  height: 250px;
+  height: 300px;
   margin-bottom: 15px;
   .micro-list {
     flex: 1;
-    height: 250px;
+    height: 300px;
     flex-direction: row;
     .micro-text {
       flex: 1;
       flex-direction: column;
-      height: 250px;
+      height: 300px;
       width: 600px;
       margin-left: 75px;
       margin-right: 75px;
@@ -48,6 +49,9 @@
       }
       .time {
         flex-direction: row;
+        display: flex;
+        justify-content: center;
+        align-content: center;
         margin-top: 10px;
         padding-left: 30px;
         .text2 {
@@ -55,6 +59,7 @@
           font-size: 30px;
           margin-right: 30px;
           font-family: myfont, serif;
+          height: 100px;
         }
       }
     }
@@ -93,21 +98,31 @@ export default {
   },
 
   //删除任务
-  delItem(idx) {
-    this.$dispatch('delItem', { idx: idx })
+  delItem(idx, type) {
+    this.$dispatch('delItem', { idx: idx, type: type })
   },
 
   //编辑任务
-  openInput(name, start, end, type, idx) {
+  openInput(name, dose, freq, type, item, idx) {
     const router = require('@system.router')
     router.push({
       uri: '/Input',
       params: {
         pushName: name,
-        pushStart: start,
-        pushEnd: end,
         pushType: type,
-        pushIdx: idx
+        pushIdx: idx,
+        push_dose: dose,
+        push_freq: freq,
+        pushEatTime: item.time_choice,
+        pushEnabled: item.alarm_enable,
+        push_isBeforeDinner_1: item.isBeforeDinner_1,
+        push_isBeforeDinner_2: item.isBeforeDinner_2,
+        push_isBeforeDinner_3: item.isBeforeDinner_3,
+        push_isBeforeDinner_4: item.isBeforeDinner_4,
+        push_time_1: item.time_1,
+        push_time_2: item.time_2,
+        push_time_3: item.time_3,
+        push_time_4: item.time_4,
       }
     })
   },
