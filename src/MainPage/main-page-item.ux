@@ -197,6 +197,7 @@
 <script>
 import media from '@system.media'
 import prompt from '@system.prompt';
+import vibrator from '@system.vibrator'
 export default {
   // type: todo == 0, doing == 1, done == 2
   props: ['item', 'idx', 'type'],
@@ -226,6 +227,12 @@ export default {
     else if(item.time_show == 3)
       item.time_show_sentence = item.time_4;
     item.isEaten = true;
+    vibrator.vibrate({
+      mode: 'short'
+    })
+    vibrator.vibrate({
+      mode: 'short'
+    })
     this.$dispatch('update', {idx: idx, med_type: item.med_type})
   },
 
@@ -236,6 +243,9 @@ export default {
   //编辑任务
   openInput(name, dose, freq, type, item, idx) {
     const router = require('@system.router')
+    vibrator.vibrate({
+      mode: 'short'
+    })
     router.push({
       uri: '/Input',
       params: {

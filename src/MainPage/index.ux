@@ -120,8 +120,7 @@ export default {
         var hour = time.getHours();
         var minute = time.getMinutes();
         that.eat_med.forEach(function (element, index){
-          console.log('测试逐个输出的结果')
-          console.log(element.med_name, element.time_show_sentence)
+          
           var hour_temp = element.time_show_sentence.split(':')[0];
           var minute_temp = element.time_show_sentence.split(':')[1];
           hour_temp = Number(hour_temp)

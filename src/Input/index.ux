@@ -493,6 +493,68 @@ export default {
               that.time_show_sentence = that.end_time_3;
             else if(that.time_show == 3)
               that.time_show_sentence = that.end_time_4;
+            console.log('闹钟设置', that.eat_enable_1, that.alarm_enable, that.eat_enable_1 == true)
+            if(that.eat_enable_1 == true && that.alarm_enable == true)
+            {
+              console.log('我进来了', hour_1, minute_1, that.med_name)
+              alarm.setAlarm({
+                hour: hour_1,
+                minute: minute_1,
+                message: that.med_name,
+                days:[0,1,2,3,4,5,6],
+                success: function() {
+                  console.log('handling success')
+                },
+                fail: function(data, code) {
+                    console.log(`handling fail, code = ${code}, errorMsg=${data}`)
+                },
+              })
+            }
+
+            if(that.eat_enable_2 == true && that.alarm_enable == true)
+              alarm.setAlarm({
+                hour: hour_2,
+                minute: minute_2,
+                message: that.med_name,
+                days:[0,1,2,3,4,5,6],
+                success: function() {
+                  console.log('handling success')
+                },
+                fail: function(data, code) {
+                    console.log(`handling fail, code = ${code}, errorMsg=${data}`)
+                },
+              })
+
+            if(that.eat_enable_3 == true && that.alarm_enable == true)
+              alarm.setAlarm({
+                hour: hour_3,
+                minute: minute_3,
+                message: that.med_name,
+                days:[0,1,2,3,4,5,6],
+                success: function() {
+                  console.log('handling success')
+                },
+                fail: function(data, code) {
+                    console.log(`handling fail, code = ${code}, errorMsg=${data}`)
+                },
+              })
+            console.log('闹钟设置', that.eat_enable_4, that.alarm_enable, that.eat_enable_4 == true)
+            if(that.eat_enable_4 == true && that.alarm_enable == true)
+            {
+              alarm.setAlarm({
+                hour: hour_4,
+                minute: minute_4,
+                message: that.med_name,
+                days:[0,1,2,3,4,5,6],
+                success: function() {
+                  console.log('handling success')
+                },
+                fail: function(data, code) {
+                    console.log(`handling fail, code = ${code}, errorMsg=${data}`)
+                },
+              })
+            }
+
 
             let info = {med_name: that.med_name, 
                         med_type: that.med_type, 
@@ -548,6 +610,10 @@ export default {
               value: list,
               success: function () {
                 that.sentence = ''
+                console.log('数据存储完毕')
+                vibrator.vibrate({
+                  mode: 'short'
+                })
                 router.back()
               },
               fail: function (data, code) {
