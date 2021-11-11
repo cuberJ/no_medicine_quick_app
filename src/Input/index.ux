@@ -29,7 +29,7 @@
         <input type="text" placeholder='示例：倍他乐克' value="{{med_name}}" onchange="getSentence(2)"></input>
         
         <div class='clear-btn' onclick='clearEventName("med_name")'></div>
-        <div class='asr-image1' onclick='enableAsrBtn'></div>
+        <!-- <div class='asr-image1' onclick='enableAsrBtn'></div> -->
       </div>
 
       <div class="med-eat-method">
@@ -951,7 +951,7 @@ export default {
     height: 300px;
     font-size: 40px;
     color: #000000;
-    background-color: #ffffff;
+    background-color: #908579;
     font-weight: bold;
     text-align: center;
     font-family: myfont-bold, serif;
@@ -961,7 +961,7 @@ export default {
     padding-left: 50px;
     padding-right: 50px;
     flex-direction: column;
-    background-color: rgb(243, 245, 250);
+    background-color: #ebe3e0;
     .task-area {
       flex-direction: row;
       .add-btn {
@@ -1111,7 +1111,7 @@ export default {
 
         .asr-submit-btn{
           height: 100px;
-          background-color: #66CC66;
+          background-color: #f9a646;
           border-radius: 20px;
           width: 20%;
           display: flex;
