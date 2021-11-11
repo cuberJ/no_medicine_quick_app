@@ -19,7 +19,7 @@
               <list class='todo-list'>
                 <block for='{{eat_med}}'>
                   <list-item type="item">
-                    <main-page-item item='{{$item}}' idx='{{$idx}}' type='1'></main-page-item>
+                    <main-page-item item='{{$item}}' idx='{{$idx}}' medShow='点击查看药物图片' type='1'></main-page-item>
                   </list-item>
                 </block>
               </list>
@@ -81,7 +81,6 @@ export default {
     this.$page.setTitleBar({ text: '安咳消' });
    
     this.$on('delItem', (evt) => {
-      console.log("evt是这个东西：", evt)
       if(evt.detail.type == "1")
         this.eat_med.splice(evt.detail.idx, 1)
       else if(evt.detail.type == "2")
@@ -91,6 +90,18 @@ export default {
       this.saveLists()
       // idx是列表条目在列表中的序号，从0开始
     })
+
+    this.$on('update', (evt) => {
+      console.log(evt.detail.med_type, evt.detail.idx)
+      var type = evt.detail.med_type;
+      if(type == 1)
+        this.eat_med[evt.detail.idx].isEaten = true;
+      else if(type == 2)
+        this.use_med[evt.detail.idx].isEaten = true;
+      else if(type == 3)
+        this.inject_med[evt.detail.idx].isEaten = true;
+      this.saveLists();
+  })
   },
   //每次显示页面时读取数据并绘制canvas
   onShow() {
@@ -98,14 +109,58 @@ export default {
     this.loadLists(function (data) {
       if (data != '') {
         let list = JSON.parse(data)
-        console.log('查看主页面的保存情况：')
-        console.log(list)
         that.eat_med = list.eat_med
         that.use_med = list.use_med
         that.inject_med = list.inject_med
         let nowDate = new Date()
         
         //最后保存list修改
+    
+        var time = new Date();
+        var hour = time.getHours();
+        var minute = time.getMinutes();
+        that.eat_med.forEach(function (element, index){
+          console.log('测试逐个输出的结果')
+          console.log(element.med_name, element.time_show_sentence)
+          var hour_temp = element.time_show_sentence.split(':')[0];
+          var minute_temp = element.time_show_sentence.split(':')[1];
+          hour_temp = Number(hour_temp)
+          minute_temp = Number(minute_temp)
+          //还没到吃药的时间，或者距离下次吃药的时间超过1小时，都是不标红警示的
+          if((hour_temp > hour || (hour_temp == hour && minute_temp > minute)))
+            element.isEaten = true;
+          else if(hour_temp >= hour && (hour_temp - hour <= 1))
+            element.isEaten = false;
+          console.log(element.isEaten, hour_temp, hour, minute_temp, minute)
+        })
+
+        that.use_med.forEach(function (element, index){
+          console.log('测试逐个输出的结果')
+          console.log(element.med_name, element.time_show_sentence)
+          var hour_temp = element.time_show_sentence.split(':')[0];
+          var minute_temp = element.time_show_sentence.split(':')[1];
+          hour_temp = Number(hour_temp)
+          minute_temp = Number(minute_temp)
+          if(hour_temp > hour || (hour_temp == hour && minute_temp > minute))
+            element.isEaten = true;
+          else
+            element.isEaten = false;
+          console.log(element.isEaten, hour_temp, hour, minute_temp, minute)
+        })
+
+        that.inject_med.forEach(function (element, index){
+          console.log('测试逐个输出的结果')
+          console.log(element.med_name, element.time_show_sentence)
+          var hour_temp = element.time_show_sentence.split(':')[0];
+          var minute_temp = element.time_show_sentence.split(':')[1];
+          hour_temp = Number(hour_temp)
+          minute_temp = Number(minute_temp)
+          if(hour_temp > hour || (hour_temp == hour && minute_temp > minute))
+            element.isEaten = true;
+          else
+            element.isEaten = false;
+          console.log(element.isEaten, hour_temp, hour, minute_temp, minute)
+        })
         that.saveLists()
       }
     })

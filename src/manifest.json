@@ -32,7 +32,8 @@
     },
     { "name": "system.alarm" },
     { "name": "system.media" },
-    { "name": "system.prompt" }
+    { "name": "system.prompt" },
+    { "name": "system.file" }
   ],
   "permissions": [
     {

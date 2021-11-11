@@ -169,8 +169,8 @@
           <text class="normal-text">图鉴封面</text>
         </div>
         <div class='event-input' style="height: 300px;">
-        <image class="image" style="resize-mode:fill" src="{{takePhotoUri}}"
-               show="{{takePhotoUri != ''}}"></image>
+          <image class="image" style="resize-mode:fill" src="{{takePhotoUri}}" id='image'
+                show="{{takePhotoUri != ''}}" onclick="requestFullscreen"></image>
         </div>
 
         <div class="photo-area">
@@ -201,6 +201,7 @@ import router from '@system.router'
 import notification from '@system.notification'
 import alarm from '@system.alarm' 
 import media from '@system.media'
+import file from '@system.file';
 import prompt from '@system.prompt';
 
 var count = 0;
@@ -236,6 +237,9 @@ export default {
     scale: '',
     pickImageUri: '',
     takePhotoUri: '',
+    image: '',
+    time_show: 0, 
+    time_show_sentence: ''
   },
   //修改任务时使用，新建时不使用
   protected: {
@@ -254,6 +258,7 @@ export default {
     push_time_2: "",
     push_time_3: "",
     push_time_4: "",
+    pushCover: '',
   },
 
   onInit() {
@@ -262,6 +267,21 @@ export default {
     this.med_name = this.pushName;
     this.med_type = Number(this.pushType);
     this.medType(this.med_type)
+    this.takePhotoUri = this.pushCover;
+    // if(this.takePhotoUri != "")
+    // {
+    //   file.get({
+    //     uri: this.takePhotoUri,
+    //     success: function(data) {
+    //       console.log(data.uri)
+    //       console.log(data.length)
+    //       console.log(data.lastModifiedTime)
+    //     },
+    //     fail: function(data, code) {
+    //       console.log(`handling fail, code = ${code}`)
+    //     }
+    //   })
+    // }
     this.freq_choice = [false, false, false, false];
     
     this.freq_choice[this.push_freq - 1] = true;
@@ -309,8 +329,6 @@ export default {
       this.isBeforeDinner[3] = false;
     else if(this.push_isBeforeDinner_4 == "true")
       this.isBeforeDinner[3] = true;
-    console.log('beforedinner的结果为：', this.isBeforeDinner, this.push_isBeforeDinner_1);
-    console.log(this.alarm_enable, this.time_choice)
   },
   onDestroy() {
     asr.close()
@@ -412,21 +430,70 @@ export default {
           if (that.med_name != '') {
             // string转数组
             let list = JSON.parse(data)
-            // console.log('保存功能的第一个测试')
-            // console.log(list);
+            
             //修改事项时触发
             if (that.pushType == "1") list.eat_med.splice(that.pushIdx, 1);
             else if (that.pushType == "2") list.use_med.splice(that.pushIdx, 1);
             else if (that.pushType == "3") list.inject_med.splice(that.pushIdx, 1);
-            // 判断todo/doing
-            // let arr = start.replace(/[:\-\\&]/g, ',').split(',')
-            // let startDate = new Date(arr[0], arr[1] - 1, arr[2], arr[3], arr[4], 0, 0)
-            // let nowDate = new Date()
-            // if (nowDate.getTime() > startDate.getTime()) list.doingList.push({ name: that.sentence, start: start, end: end })
-            // else list.toDoList.push({ name: that.sentence, start: start, end: end })
-            // 保存list并返回
-            // console.log('保存功能的第二个测试')
-            // console.log(freq_sub)
+           
+            var temps = that.takePhotoUri.replace('internal://', '')
+            temps = "internal://files/" + temps;
+            
+
+            var cur_time = new Date();
+            var hour = cur_time.getHours();
+            var minute = cur_time.getMinutes();
+
+            var hour_1 = Number(that.end_time_1.split(':')[0])
+            var minute_1 = Number(that.end_time_1.split(':')[1])
+            var hour_2 = Number(that.end_time_2.split(':')[0])
+            var minute_2 = Number(that.end_time_2.split(':')[1])
+            var hour_3 = Number(that.end_time_3.split(':')[0])
+            var minute_3 = Number(that.end_time_3.split(':')[1])
+            var hour_4 = Number(that.end_time_4.split(':')[0])
+            var minute_4 = Number(that.end_time_4.split(':')[1])
+            var hour_max = 0
+            var min_max = 0
+            if(that.time_choice == 1)
+            {
+              hour_max = hour_1;
+              min_max = minute_1;
+            }
+            else if(that.time_choice == 2)
+            {
+              hour_max = hour_2;
+              min_max = minute_2;
+            }
+            else if(that.time_choice == 3)
+            {
+              hour_max = hour_3;
+              min_max = minute_3;
+            }
+            else if(that.time_choice == 4)
+            {
+              hour_max = hour_4;
+              min_max = minute_4;
+            }
+
+            if((hour < hour_1) || (hour == hour_1 && minute <= minute_1) || (hour > hour_max) || (hour == hour_max && minute > min_max))
+            {
+              that.time_show = 0;
+            }
+            else if(((hour < hour_2) || (hour == hour_2 && minute <= minute_2)) && (that.time_choice >= 2))
+              that.time_show = 1;
+            else if(((hour < hour_3) || (hour == hour_3 && minute <= minute_3)) && (that.time_choice >= 3))
+              that.time_show = 2;
+            else if(((hour < hour_4) || (hour == hour_4 && minute <= minute_4)) && (that.time_choice >= 4))
+              that.time_show = 3;
+            if(that.time_show == 0)
+              that.time_show_sentence = that.end_time_1;
+            else if(that.time_show == 1)
+              that.time_show_sentence = that.end_time_2;
+            else if(that.time_show == 2)
+              that.time_show_sentence = that.end_time_3;
+            else if(that.time_show == 3)
+              that.time_show_sentence = that.end_time_4;
+
             let info = {med_name: that.med_name, 
                         med_type: that.med_type, 
                         dose: that.dose, 
@@ -441,14 +508,16 @@ export default {
                         isBeforeDinner_4: that.isBeforeDinner[3],
                         alarm_enable: that.alarm_enable,
                         time_choice: that.time_choice,
-                        cover: '',
+                        cover: (that.takePhotoUri === "" ? "" : temps),
                         enabled: that.enabled,
                         time_1: that.end_time_1,
                         time_2: that.end_time_2,
                         time_3: that.end_time_3,
                         time_4: that.end_time_4,
+                        time_show: that.time_show,
+                        time_show_sentence: that.time_show_sentence,
+                        isEaten: false,
                                 }
-            console.log('录入时isDinner的结果为', info.isBeforeDinner_1, info.isBeforeDinner_2)
             if(that.med_type == 1)
             {
               list.eat_med.push(info);
@@ -459,21 +528,32 @@ export default {
             else{
               list.inject_med.push(info)
             }
-            console.log('保存功能的第三个测试')
-            console.log(list)
+
+            if(that.takePhotoUri != "")
+            {
+              file.copy({
+                srcUri: that.takePhotoUri,
+                dstUri: temps,
+                success: function(uri) {
+                  console.log(`photomove success: ${uri}`)
+                },
+                fail: function(data, code) {
+                  console.log(`movehandling fail, code = ${code}`);
+                }
+              })
+            }
+        
             storage.set({
               key: 'msg',
               value: list,
               success: function () {
                 that.sentence = ''
-                console.log('查看存储结果：')
-                console.log(list)
                 router.back()
               },
               fail: function (data, code) {
                 that.$app.$def.makeToast(`handling fail, code = ${code}`)
               }
-            })
+            });
           }
         },
         fail: function (data, code) {
@@ -559,10 +639,8 @@ export default {
     this.time_choice = 3;
   },
   display_4(){
-    console.log('display运行了1号', this.alarm_enable, this.alarm_enable === true)
     if(this.alarm_enable === true)
     {
-      console.log('display运行了')
       this.eat_enable_1 = true;
       this.eat_enable_2 = true;
       this.eat_enable_3 = true;
@@ -619,6 +697,15 @@ export default {
     media.takePhoto({
         success: (data) => {
             console.log("handling success: " + data.uri);
+             file.delete({
+                uri: this.takePhotoUri,
+                success: function(data) {
+                  console.log('handling success')
+                },
+                fail: function(data, code) {
+                  console.log(`handling fail, code = ${code}`)
+              }
+              })
             this.takePhotoUri = data.uri;
         },
         cancel: () => {
@@ -641,18 +728,28 @@ export default {
 
   // 选择照片
   pickImage() {
-      media.pickImage({
-          success: (data) => {
-              console.log("handling success: " + data.uri);
-              // this.pickImageUri = data.uri;
-              this.takePhotoUri = data.uri;
-              console.log("handling success: " + this.takePhotoUri);
-              prompt.showToast({
-                  message: 'uri:' + this.takePhotoUri,
-                  duration: 0
-              });
-          }
-      })
+   
+    media.pickImage({
+        success: (data) => {
+            console.log("handling success: " + data.uri);
+            //this.pickImageUri = data.uri;
+             file.delete({
+                uri: this.takePhotoUri,
+                success: function(data) {
+                  console.log('handling success')
+                },
+                fail: function(data, code) {
+                  console.log(`handling fail, code = ${code}`)
+              }
+              })
+            this.takePhotoUri = data.uri;
+            console.log("handling success: " + this.takePhotoUri);
+            prompt.showToast({
+                message: 'uri:' + this.takePhotoUri,
+                duration: 0
+            });
+        }
+    })
   },
 
   //正则处理语音输入的文本
@@ -709,7 +806,6 @@ export default {
         case 3: {
           this.display_3();
           this.freq_choice[2] = true;
-          console.log('成功转换')
           break;
           }
         case 4: {
@@ -739,13 +835,27 @@ export default {
   },
 
   getSentence(index, e){
-    console.log(e.value);
     if(index == 1)
       this.sentence = e.value;
     else if(index == 2)
       this.med_name = e.value;
     else if(index == 3)
       this.dose = e.value;
+  },
+
+  requestFullscreen(){
+    let that = this
+    media.previewImage({
+      current: that.takePhotoUri,
+      uris: [that.takePhotoUri],
+      success: function() {
+      console.log('preview success')
+      },
+      fail: function(data, code) {
+        console.log('preview fail, code = ${code}');
+      }
+    })
+    
   }
 }
 </script>
@@ -860,11 +970,15 @@ export default {
       height: 100px;
       border-radius: 20px;
       background-color: #ffffff;
+      justify-content: center;
       border: 5px solid rgb(238, 240, 245);
       flex-direction: row;
       > input {
         flex-grow: 1;
         padding: 10px 30px;
+      }
+      >image{
+
       }
     }
 

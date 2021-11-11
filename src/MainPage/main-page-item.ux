@@ -2,12 +2,29 @@
 <template>
   <div class="item">
     <list class='micro-list'>
-      <list-item class="micro-text" type="item" onclick='openInput(item.med_name,item.dose,item.freq_choice,type,item, idx)'>
-        <text class='text1'>{{item.med_name}}</text>
+      <list-item class="micro-text" type="item">
+        <div>
+          <div>
+          <text class='text1'>{{item.med_name}}</text>
+          </div>
+          <div class="edit">
+            <text onclick='openInput(item.med_name,item.dose,item.freq_choice,type,item, idx)'>编辑信息</text>
+          </div>
+        </div>
         <div class='time'>
-          <text class='text2'>单次剂量:\n{{item.dose}}</text>
-          <text class='text2'>下次用药时间:\n{{item.freq_choice}}\n</text>
-          
+          <text class='text2' >单次剂量:\n{{item.dose}}</text>
+          <text class='{{item.isEaten ? "text3" : "text4"}}'>下次用药时间:\n{{item.time_show_sentence}}\n</text>
+        </div>
+        <!-- <div class='photo'>
+          <text onclick="requestFullscreen(item, medShow)">点击查看拍摄的药物图片</text>
+        </div> -->
+        <div class="confirm-area">
+          <div class="photos">
+            <text onclick='requestFullscreen(item, medShow)'>药物图片</text>
+          </div>
+          <div class="confirm">
+            <text onclick='getTime(item, idx)'>我已吃药</text>
+          </div>
         </div>
       </list-item>
       <list-item class="micro-btn" type="item">
@@ -23,29 +40,29 @@
 
 .item {
   flex: 1;
-  height: 300px;
+  height: 350px;
   margin-bottom: 15px;
   .micro-list {
     flex: 1;
-    height: 300px;
+    height: 350px;
     flex-direction: row;
     .micro-text {
       flex: 1;
       flex-direction: column;
-      height: 300px;
+      height: 350px;
       width: 600px;
       margin-left: 75px;
       margin-right: 75px;
       flex-grow: 0;
-      background-color: #ffffff;
+      background-color: #ebe3e0;
       border: 1px solid rgb(238, 240, 245);
       border-radius: 20px;
       .text1 {
         padding-top: 12px;
-        padding-left: 25px;
+        padding-left: 60px;
         font-weight: bold;
         font-size: 50px;
-        color: #000000;
+        color: #695e59;
       }
       .time {
         flex-direction: row;
@@ -53,13 +70,73 @@
         justify-content: center;
         align-content: center;
         margin-top: 10px;
-        padding-left: 30px;
+        padding-left: 0px;
         .text2 {
           width: 320px;
           font-size: 30px;
           margin-right: 30px;
           font-family: myfont, serif;
           height: 100px;
+          color: #908579;
+          font-weight: bolder;
+          text-shadow: #645d55 10px 10px 10px;
+          text-align: center;
+        }
+        .text3 {
+          width: 320px;
+          font-size: 30px;
+          margin-right: 30px;
+          font-family: myfont, serif;
+          height: 100px;
+          padding-top: 40px;
+          color: #908579;
+          font-weight: bolder;
+          text-shadow: #645d55 10px 10px 10px;
+          text-align: center;
+        }
+        .text4{
+          width: 320px;
+          font-size: 30px;
+          margin-right: 30px;
+          font-family: myfont, serif;
+          height: 100px;
+          padding-top: 40px;
+          color: #dd6a6a;
+          font-weight: bolder;
+          text-shadow: #645d55 10px 10px 10px;
+          text-align: center;
+          text-decoration: underline;
+        }
+      }
+
+      .photo{
+        flex-direction: row;
+        display: flex;
+        align-content: center;
+        margin-top: 15px;
+        padding-left: 100px;
+        
+        font-weight: bolder;
+        >text{
+          color: #dd6a6a;
+          text-decoration: underline;
+        }
+      }
+
+      .edit{
+        margin-left: 120px;
+        margin-top: 20px;
+        width:150px;
+        height: 80px;
+        display: flex;
+        align-content: center;
+        justify-content: center;
+        /* background-color: #f9a646; */
+        /* border-radius: 20px; */
+        >text{
+          color: #3b80b9;
+          align-content: center;
+          text-decoration: underline;
         }
       }
     }
@@ -69,8 +146,39 @@
       width: 60px;
       background-color: #f5f5f5;
     }
+
+    .confirm-area{
+      display: flex;
+      justify-content: center;
+      align-content: center;
+      margin-top:20px;
+      flex-direction: row;
+      .photos{
+        margin-right:100px;
+       
+        display: flex;
+        align-content: center;
+        justify-content: center;
+        background-color: #f9a646;
+        border-radius: 20px;
+        width:150px;
+        height: 80px;
+      }
+      .confirm{
+        margin-left:60px;
+        
+        display: flex;
+        align-content: center;
+        justify-content: center;
+        background-color: #ee6952;
+        border-radius: 20px;
+        width:150px;
+        height: 80px;
+      }
+    }
   }
 }
+
 
 .check-btn {
   width: 50px;
@@ -87,11 +195,15 @@
 </style>
 
 <script>
-
+import media from '@system.media'
+import prompt from '@system.prompt';
 export default {
   // type: todo == 0, doing == 1, done == 2
   props: ['item', 'idx', 'type'],
-  
+  private:{
+    medCover: '暂无药物图片记录',
+    showCover: false,
+  },
   //标记任务已完成
   markDone(idx) {
     this.$dispatch('doneItem', { idx: idx, type: this.type })
@@ -100,6 +212,25 @@ export default {
   //删除任务
   delItem(idx, type) {
     this.$dispatch('delItem', { idx: idx, type: type })
+  },
+
+  //用药时间信息刷新
+  getTime(item, idx){
+    item.time_show = (item.time_show + 1) % item.time_choice 
+    if(item.time_show == 0)
+      item.time_show_sentence = item.time_1;
+    else if(item.time_show == 1)
+      item.time_show_sentence = item.time_2;
+    else if(item.time_show == 2)
+      item.time_show_sentence = item.time_3;
+    else if(item.time_show == 3)
+      item.time_show_sentence = item.time_4;
+    item.isEaten = true;
+    this.$dispatch('update', {idx: idx, med_type: item.med_type})
+  },
+
+  onInit() {
+    
   },
 
   //编辑任务
@@ -123,8 +254,40 @@ export default {
         push_time_2: item.time_2,
         push_time_3: item.time_3,
         push_time_4: item.time_4,
+        pushCover: item.cover,
       }
     })
   },
+
+  requestFullscreen(item){
+    if(item.cover === '')
+    {
+      this.showCover = false;
+      prompt.showDialog({
+        title:'抱歉，您之前尚未拍摄药物照片',
+        buttons:[
+          {text: '确定',
+          color: '#333333'}
+        ]
+      })
+    }
+    else
+      this.showCover = true;
+    if(this.showCover === true)
+    {
+      media.previewImage({
+      current: item.cover,
+      uris: [item.cover],
+      success: function() {
+      console.log('preview success')
+      },
+      fail: function(data, code) {
+        console.log('preview fail, code = ${code}');
+        console.log(item.cover)
+      }
+    })
+    }
+    
+  }
 }
 </script>
