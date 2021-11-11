@@ -170,12 +170,13 @@
         </div>
         <div class='event-input' style="height: 300px;">
           <image class="image" style="resize-mode:fill" src="{{takePhotoUri}}" id='image'
-                show="{{takePhotoUri != ''}}" onclick="requestFullscreen"></image>
+                show="{{takePhotoUri != ''}}" onclick="requestFullscreen" ></image>
         </div>
 
         <div class="photo-area">
           <input class="add-btn" type="button" value="拍照" onclick="takephoto" />
           <input class="add-btn" type="button" value="选取" onclick="pickImage" />
+          <input class="del-btn" type="button" value="删除" onclick="deletePhoto" />
         </div>
       </div>
 
@@ -792,6 +793,20 @@ export default {
     })
   },
 
+  //删除照片
+  deletePhoto(){
+    file.delete({
+      uri: this.takePhotoUri,
+      success: function(data) {
+        console.log('handling success')
+      },
+      fail: function(data, code) {
+        console.log(`handling fail, code = ${code}`)
+    }
+    });
+    this.takePhotoUri = '';
+  }, 
+
   // 选择照片
   pickImage() {
    
@@ -978,8 +993,21 @@ export default {
     background-color: #473cb1;
     align-self: flex-end;
     margin-bottom: 10px;
-    margin-left: 100px;
+    margin-left: 35px;
   }
+
+  .del-btn{
+    width: 150px;
+    height: 80px;
+    font-size: 35px;
+    border-radius: 25px;
+    color: #ffffff;
+    background-color: #ee6952;
+    align-self: flex-end;
+    margin-bottom: 10px;
+    margin-left: 35px;
+  } 
+
   .med-eat-method{
     flex-direction: row;
   }
