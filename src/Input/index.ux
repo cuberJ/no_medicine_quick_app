@@ -29,7 +29,7 @@
         <input type="text" placeholder='示例：倍他乐克' value="{{med_name}}" onchange="getSentence(2)"></input>
         
         <div class='clear-btn' onclick='clearEventName("med_name")'></div>
-        <!-- <div class='asr-image1' onclick='enableAsrBtn'></div> -->
+        <!--  -->
       </div>
 
       <div class="med-eat-method">
@@ -269,25 +269,11 @@ export default {
     this.med_type = Number(this.pushType);
     this.medType(this.med_type)
     this.takePhotoUri = this.pushCover;
-    // if(this.takePhotoUri != "")
-    // {
-    //   file.get({
-    //     uri: this.takePhotoUri,
-    //     success: function(data) {
-    //       console.log(data.uri)
-    //       console.log(data.length)
-    //       console.log(data.lastModifiedTime)
-    //     },
-    //     fail: function(data, code) {
-    //       console.log(`handling fail, code = ${code}`)
-    //     }
-    //   })
-    // }
+    
     this.freq_choice = [false, false, false, false];
     
     this.freq_choice[this.push_freq - 1] = true;
     this.dose = this.push_dose;
-    // this.eat_enable = this.push_eat_enable;
     this.time_choice = this.pushEatTime;
     this.time_choice = Number(this.time_choice)
     if(this.time_choice == 1)
@@ -307,7 +293,10 @@ export default {
       this.eat_enable_3 = false;
       this.eat_enable_4 = false;
     }
-    this.end_time_1 = this.push_time_1;
+    if(this.push_time_1 == '')
+      this.end_time_1 = '8:00'
+    else
+      this.end_time_1 = this.push_time_1;
     this.end_time_2 = this.push_time_2;
     this.end_time_3 = this.push_time_3;
     this.end_time_4 = this.push_time_4;
@@ -677,7 +666,7 @@ export default {
       this.eat_enable_2 = false;
       this.eat_enable_3 = false;
       this.eat_enable_4 = false;
-     
+      this.end_time_1 = '8:00';
     }
      this.time_choice = 1;
   },
@@ -688,6 +677,7 @@ export default {
       this.eat_enable_2 = true;
       this.eat_enable_3 = false;
       this.eat_enable_4 = false;
+      this.end_time_1 = '8:00';
       this.end_time_2 = '14:00';
     }
     this.time_choice = 2;
@@ -700,6 +690,7 @@ export default {
       this.eat_enable_3 = true;
       this.eat_enable_4 = false;
       this.end_time_2 = '14:00';
+      this.end_time_1 = '8:00';
       this.end_time_3 = '20:00';
       
     }
@@ -944,7 +935,6 @@ export default {
 <style lang="less">
 @import "../Common/css/font.css";
 
-/* 主Widget树 */
 .input-page {
   flex-direction: column;
   > text {
@@ -1071,9 +1061,7 @@ export default {
         flex-grow: 1;
         padding: 10px 30px;
       }
-      >image{
-
-      }
+     
     }
 
     .asr-input-area{
@@ -1257,7 +1245,6 @@ export default {
   height: 40px;
   margin: 20px 0px 20px 20px;
   border-width: 0px;
-  /* background-image: url("/Common/asr.png"); */
 }
 
 .clear-btn {

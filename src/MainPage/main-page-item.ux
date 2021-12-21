@@ -15,9 +15,6 @@
           <text class='text2' >单次剂量:\n{{item.dose}}</text>
           <text class='{{item.isEaten ? "text3" : "text4"}}'>下次用药时间:\n{{item.time_show_sentence}}\n</text>
         </div>
-        <!-- <div class='photo'>
-          <text onclick="requestFullscreen(item, medShow)">点击查看拍摄的药物图片</text>
-        </div> -->
         <div class="confirm-area">
           <div class="photos">
             <text onclick='requestFullscreen(item, medShow)'>药物图片</text>
@@ -28,7 +25,6 @@
         </div>
       </list-item>
       <list-item class="micro-btn" type="item">
-        <!-- <div if='{{type != 2}}' class='check-btn' onclick="markDone(idx)"></div> -->
         <div class='cancle-btn' onclick="delItem(idx, type)"></div>
       </list-item>
     </list>

@@ -3,10 +3,6 @@
 <template>
       <!-- 主页 -->
       <div class="main-page {{aboveAnim}}">
-        <!-- <div class='header' onswipe='aboveSwipe'>
-          <text class='span1'>安咳消</text>
-          <text class='span2'>——your medicine reminder</text>
-        </div> -->
         <tabs class="tabs" onchange="changeTabactive" index="{{activeIndex}}">
           <tab-bar class="tab-bar">
             <text class="tab-text">口服药</text>
@@ -76,8 +72,7 @@ export default {
     ]
   },
 
-  onInit() {
-    // storage.clear() 
+  onInit() { 
     this.$page.setTitleBar({ text: '安咳消' });
    
     this.$on('delItem', (evt) => {
@@ -92,7 +87,6 @@ export default {
     })
 
     this.$on('update', (evt) => {
-      console.log(evt.detail.med_type, evt.detail.idx)
       var type = evt.detail.med_type;
       if(type == 1)
         this.eat_med[evt.detail.idx].isEaten = true;
@@ -103,7 +97,7 @@ export default {
       this.saveLists();
   })
   },
-  //每次显示页面时读取数据并绘制canvas
+  
   onShow() {
     let that = this
     this.loadLists(function (data) {
@@ -134,8 +128,6 @@ export default {
         })
 
         that.use_med.forEach(function (element, index){
-          console.log('测试逐个输出的结果')
-          console.log(element.med_name, element.time_show_sentence)
           var hour_temp = element.time_show_sentence.split(':')[0];
           var minute_temp = element.time_show_sentence.split(':')[1];
           hour_temp = Number(hour_temp)
@@ -148,8 +140,7 @@ export default {
         })
 
         that.inject_med.forEach(function (element, index){
-          console.log('测试逐个输出的结果')
-          console.log(element.med_name, element.time_show_sentence)
+        
           var hour_temp = element.time_show_sentence.split(':')[0];
           var minute_temp = element.time_show_sentence.split(':')[1];
           hour_temp = Number(hour_temp)
@@ -345,118 +336,4 @@ export default {
   }
 }
 
-/* forward animation */
-
-.aboveForward {
-  animation-name: aboveForward;
-  animation-duration: 500ms;
-  animation-fill-mode: forwards;
-  animation-timing-function: linear;
-  animation-iteration-count: 1;
-}
-
-@keyframes aboveForward {
-  from {
-    transform: translateX(0px) rotateY(0deg);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(-375px) rotateY(-90deg);
-    opacity: 0;
-  }
-}
-
-.belowForward {
-  animation-name: belowForward;
-  animation-duration: 500ms;
-  animation-fill-mode: forwards;
-  animation-timing-function: linear;
-  animation-iteration-count: 1;
-}
-
-@keyframes belowForward {
-  from {
-    transform: translateX(375px) rotateY(90deg);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0px) rotateY(0deg);
-    opacity: 1;
-  }
-}
-
-.maskForward {
-  animation-name: maskForward;
-  animation-duration: 600ms;
-  animation-fill-mode: forwards;
-  animation-timing-function: linear;
-  animation-iteration-count: 1;
-  animation-delay: 600ms;
-}
-
-@keyframes maskForward {
-  from {
-    transform: translateX(0px);
-  }
-  to {
-    transform: translateX(750px);
-  }
-}
-
-/* reverse animation */
-
-.aboveReverse {
-  animation-name: aboveReverse;
-  animation-duration: 500ms;
-  animation-fill-mode: forwards;
-  animation-timing-function: linear;
-  animation-iteration-count: 1;
-}
-
-@keyframes aboveReverse {
-  from {
-    transform: translateX(-375px) rotateY(-90deg);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0px) rotateY(0deg);
-    opacity: 1;
-  }
-}
-
-.belowReverse {
-  animation-name: belowReverse;
-  animation-duration: 500ms;
-  animation-fill-mode: forwards;
-  animation-timing-function: linear;
-  animation-iteration-count: 1;
-}
-
-@keyframes belowReverse {
-  from {
-    transform: translateX(0px) rotateY(0deg);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(375px) rotateY(90deg);
-    opacity: 0;
-  }
-}
-
-.maskReverse {
-  animation-name: maskReverse;
-  animation-duration: 500ms;
-  animation-fill-mode: forwards;
-  animation-timing-function: linear;
-  animation-iteration-count: 1;
-}
-
-@keyframes maskReverse {
-  from {
-    transform: translateX(750px);
-  }
-  to {
-    transform: translateX(0px);
-  }
-}
 </style>
